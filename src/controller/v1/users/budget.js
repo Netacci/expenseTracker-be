@@ -362,48 +362,29 @@ const deleteExpense = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// const getBudgetSummary = async (req, res) => {
-//   const { budgetId } = req.params;
-//   try {
-//     const budget = await Budget.findById(budgetId)
-//       .populate('categories')
-//       .populate('incomes');
-//     if (!budget) {
-//       return res.status(404).json({ message: 'Budget not found' });
-//     }
-//     // Calculate total income
-//     const totalIncome = budget.incomes.reduce(
-//       (acc, income) => acc + income.amount,
-//       0
-//     );
-//     const categories = await Category.find({
-//       _id: { $in: budget.categories },
-//     }).populate('expenses');
-//     // Calculate total expenses
-//     const totalExpenses = categories.reduce((acc, category) => {
-//       const categoryExpenses = category.expenses.reduce(
-//         (sum, expense) => sum + expense.amount,
-//         0
-//       );
-//       return acc + categoryExpenses;
-//     }, 0);
-//     const totalBudgetAmount = categories.reduce(
-//       (acc, category) => acc + category.amount,
-//       0
-//     );
-//     const balance = totalIncome - totalExpenses;
-
-//     res.status(200).json({
-//       totalIncome,
-//       totalExpenses,
-//       totalBudgetAmount,
-//       balance,
-//     });
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// };
-
+const getRecentExpenses = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const budget = await Budget.findById(id).populate('categories');
+    if (!budget) {
+      return res.status(404).json({ message: 'Budget not found' });
+    }
+    // const recentExpenses = budget.categories
+    //   .map((category) => category.expenses.slice(-3))
+    //   .flat();
+    const recentExpenses = budget.categories
+      .map((category) =>
+        category.expenses.slice(-3).map((expense) => ({
+          ...expense.toObject(),
+          categoryName: category.name,
+        }))
+      )
+      .flat();
+    res.status(200).json({ data: recentExpenses, status: 200 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 export {
   createBudget,
   getSingleBudget,
@@ -422,4 +403,5 @@ export {
   getAllExpenses,
   editExpense,
   deleteExpense,
+  getRecentExpenses,
 };

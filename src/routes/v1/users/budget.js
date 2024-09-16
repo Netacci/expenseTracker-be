@@ -17,6 +17,7 @@ import {
   getAllCategories,
   getAllExpenses,
   getAllIncomes,
+  getRecentExpenses,
   getSingleBudget,
 } from '../../../controller/v1/users/budget.js';
 
@@ -58,4 +59,5 @@ router.delete(
   authenticate('user'),
   deleteExpense
 );
+router.get('/:id/recent-expenses/', authenticate('user'), getRecentExpenses);
 export default router;
