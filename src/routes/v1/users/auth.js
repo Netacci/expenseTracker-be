@@ -18,7 +18,7 @@ import authenticate from '../../../middlewares/authenticate.js';
 const router = Router();
 router.post('/register', register);
 router.put('/verify-email', verifyEmail);
-router.post('/login', login);
+router.post('/login', loginLimiter, login);
 router.put('/resend-verification-email', resendVerificationEmail);
 router.put('/reset-password', resetPassword);
 
