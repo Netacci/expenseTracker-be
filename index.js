@@ -41,12 +41,9 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+
 const corsOptions = {
-  origin: [
-    'http://localhost:5000',
-    'http://localhost:5173',
-    'https://expense-tracker-netaccis-projects.vercel.app',
-  ],
+  origin: process.env.CORS_ORIGINS.split(','),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: [
@@ -59,7 +56,11 @@ app.use(cors(corsOptions));
 app.use('/api/v1/auth', userAuthRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
+const server = http.createServer(app);
 
-app.listen(process.env.PORT, () => {
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 120000;
+
+app.listen(process.env.PORT || 5001, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
