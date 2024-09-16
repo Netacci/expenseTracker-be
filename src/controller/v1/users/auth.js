@@ -3,8 +3,11 @@ import bcrypt from 'bcryptjs';
 import User from '../../../models/v1/users/auth.js';
 import { sendEmail } from '../../../utils/emails.js';
 import validator from 'validator';
+import { body } from 'express-validator';
 
 const register = async (req, res) => {
+  await body('email').isEmail().normalizeEmail().run(req);
+  await body('first_name').escape().trim().run(req);
   const { email, password, first_name } = req.body;
   try {
     if (!email || !password || !first_name) {

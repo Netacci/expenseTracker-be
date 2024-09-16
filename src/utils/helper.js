@@ -1,4 +1,5 @@
 import Budget from '../models/v1/users/budget.js';
+import logger from './logger.js';
 
 export const updateTotals = async (budgetId) => {
   try {
@@ -38,7 +39,7 @@ export const updateTotals = async (budgetId) => {
     budget.balance = balance;
     await budget.save();
   } catch (err) {
-    console.error('Error updating totals:', err.message);
+    logger.error('Error updating totals:', err.message);
     throw new Error('Failed to update budget totals');
   }
 };

@@ -9,11 +9,13 @@ import {
 } from '../../../controller/v1/users/auth.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import { loginLimiter } from '../../../middlewares/rateLimiting.js';
+import logger from '../../../utils/logger.js';
 
 const router = Router();
 router.post('/register', register);
 router.put('/verify-email', verifyEmail);
-router.post('/login', login);
+router.post('/login', loginLimiter, login);
 router.put('/resend-verification-email', resendVerificationEmail);
 router.put('/reset-password', resetPassword);
 
@@ -36,7 +38,7 @@ router.get(
         `${process.env.BASE_URL}/auth/google/callback?token=${token}`
       );
     } catch (error) {
-      console.error('Error in Google callback:', error);
+      logger.error('Error in Google callback:', error);
       res.redirect('/login');
     }
   }

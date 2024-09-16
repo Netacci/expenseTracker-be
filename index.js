@@ -11,6 +11,7 @@ import userAuthRoutes from './src/routes/v1/users/auth.js';
 import userRoutes from './src/routes/v1/users/user.js';
 import budgetRoutes from './src/routes/v1/users/budget.js';
 import http from 'http';
+import logger from './src/utils/logger.js';
 
 dotenv.config();
 const app = express();
@@ -32,10 +33,10 @@ app.use(passport.session());
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('Connected to mongoDB');
+    logger.info('Connected to mongoDB');
   })
   .catch((err) => {
-    console.log(`Error connecting to mongoDB ${err}`);
+    logger.error(`Error connecting to mongoDB ${err}`);
   });
 
 app.use(bodyParser.json());
@@ -63,5 +64,5 @@ server.keepAliveTimeout = 120000;
 server.headersTimeout = 120000;
 
 app.listen(process.env.PORT || 5001, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+  logger.info(`Server running on port ${process.env.PORT}`);
 });

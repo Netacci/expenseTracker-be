@@ -1,5 +1,6 @@
 import sendGrid from '@sendgrid/mail';
 import dotenv from 'dotenv';
+import logger from './logger.js';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const sendEmail = async (to, templateId, subject, dynamicData) => {
       dynamic_template_data: dynamicData,
     });
   } catch (e) {
-    console.error(e);
+    logger.error(e);
 
     return e.message;
   }
