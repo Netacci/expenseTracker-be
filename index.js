@@ -10,6 +10,7 @@ import passport from './src/utils/auth.js';
 import userAuthRoutes from './src/routes/v1/users/auth.js';
 import userRoutes from './src/routes/v1/users/user.js';
 import budgetRoutes from './src/routes/v1/users/budget.js';
+import http from 'http';
 
 dotenv.config();
 const app = express();
