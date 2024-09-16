@@ -28,7 +28,7 @@ const register = async (req, res) => {
     await user.save();
     const hostlink =
       process.env.NODE_ENV === 'production'
-        ? 'https://skenny.org'
+        ? 'https://expense-tracker-netaccis-projects.vercel.app'
         : 'http://localhost:5173';
     const link = `${hostlink}/email/confirm/${verificationToken}/${email}`;
 
@@ -104,7 +104,7 @@ const resendVerificationEmail = async (req, res) => {
   // Send the email
   const hostlink =
     process.env.NODE_ENV === 'production'
-      ? 'https://skenny.org'
+      ? 'https://expense-tracker-netaccis-projects.vercel.app'
       : 'http://localhost:5173';
   const link = `${hostlink}/email/confirm/${verificationToken}/${email}`;
   await sendEmail(
@@ -168,7 +168,7 @@ const forgotPassword = async (req, res) => {
     user.verificationToken = token;
     const hostlink =
       process.env.NODE_ENV === 'production'
-        ? 'https://skenny.org'
+        ? 'https://expense-tracker-netaccis-projects.vercel.app'
         : 'http://localhost:5173';
     await user.save();
     const subject = 'Password reset request';

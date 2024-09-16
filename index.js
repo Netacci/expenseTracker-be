@@ -42,7 +42,11 @@ app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 const corsOptions = {
-  origin: ['http://localhost:5000', 'http://localhost:5173'],
+  origin: [
+    'http://localhost:5000',
+    'http://localhost:5173',
+    'https://expense-tracker-netaccis-projects.vercel.app',
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: [
