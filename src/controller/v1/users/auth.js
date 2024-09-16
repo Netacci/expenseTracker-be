@@ -4,6 +4,7 @@ import User from '../../../models/v1/users/auth.js';
 import { sendEmail } from '../../../utils/emails.js';
 import validator from 'validator';
 import { body } from 'express-validator';
+import logger from '../../../utils/logger.js';
 
 const register = async (req, res) => {
   await body('email').isEmail().normalizeEmail().run(req);
@@ -144,9 +145,11 @@ const login = async (req, res) => {
     if (!user.is_email_verified) {
       return res.status(401).json({ message: 'Verify your email' });
     }
-    const isPasswordCorrect = bcrypt.compare(password, user.password);
+    console.log(password, user.password);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      logger.warn(`User with ${email} provided the wrong password ${password}`);
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
     const token = jwt.sign(
       { id: user._id, email: user.email },
