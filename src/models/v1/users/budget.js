@@ -111,6 +111,11 @@ const budgetSchema = new mongoose.Schema(
     },
     categories: [categorySchema],
     incomes: [incomeSchema],
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

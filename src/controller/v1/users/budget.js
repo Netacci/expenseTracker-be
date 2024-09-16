@@ -15,6 +15,7 @@ const createBudget = async (req, res) => {
       start_date,
       end_date,
       description,
+      user: req.user._id,
     });
 
     res.status(201).json({
@@ -28,15 +29,19 @@ const createBudget = async (req, res) => {
 };
 const getAllBudgets = async (req, res) => {
   try {
-    const budgets = await Budget.find().select('-__v');
+    const budgets = await Budget.find({ user: req.user._id }).select('-__v');
     res.status(200).json({ data: budgets, status: 200 });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 const getSingleBudget = async (req, res) => {
+  const { id } = req.params;
   try {
-    const budget = await Budget.findById(req.params.id).select(' -__v');
+    const budget = await Budget.findById({
+      _id: id,
+      user: req.user._id,
+    }).select(' -__v');
 
     res.status(200).json({ data: budget, status: 200 });
   } catch (err) {
@@ -46,9 +51,10 @@ const getSingleBudget = async (req, res) => {
 const editBudget = async (req, res) => {
   const { name, amount, currency, start_date, end_date, description } =
     req.body;
+  const { id } = req.params;
   try {
     const budget = await Budget.findByIdAndUpdate(
-      req.params.id,
+      { _id: id, user: req.user._id },
       { name, amount, currency, start_date, end_date, description },
       { new: true }
     );
@@ -60,8 +66,9 @@ const editBudget = async (req, res) => {
   }
 };
 const deleteBudget = async (req, res) => {
+  const { id } = req.params;
   try {
-    await Budget.findByIdAndDelete(req.params.id);
+    await Budget.findByIdAndDelete({ _id: id, user: req.user._id });
     res
       .status(200)
       .json({ message: 'Budget deleted successfully', status: 200 });
