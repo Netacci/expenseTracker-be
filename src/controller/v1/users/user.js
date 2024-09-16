@@ -1,3 +1,4 @@
+import validator from 'validator';
 import User from '../../../models/v1/users/auth.js';
 import bcrypt from 'bcryptjs';
 
@@ -32,6 +33,11 @@ const changePassword = async (req, res) => {
       return res
         .status(401)
         .json({ message: 'New password cannot be the same as old password' });
+    }
+    if (!validator.isStrongPassword(newPassword)) {
+      return res.status(400).json({
+        message: `Weak password: ${newPassword}. Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`,
+      });
     }
     const match = await bcrypt.compare(oldPassword, req.user.password);
     if (!match) {

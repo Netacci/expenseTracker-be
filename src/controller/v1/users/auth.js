@@ -145,7 +145,6 @@ const login = async (req, res) => {
     if (!user.is_email_verified) {
       return res.status(401).json({ message: 'Verify your email' });
     }
-    console.log(password, user.password);
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       logger.warn(`User with ${email} provided the wrong password ${password}`);
@@ -210,6 +209,11 @@ const resetPassword = async (req, res) => {
     const user = await User.findOne({ email: decoded.email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({
+        message: `Weak password: ${password}. Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`,
+      });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
