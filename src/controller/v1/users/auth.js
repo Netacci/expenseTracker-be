@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../../../models/v1/users/auth.js';
 import { sendEmail } from '../../../utils/emails.js';
-import passport from 'passport';
+import validator from 'validator';
+
 const register = async (req, res) => {
   const { email, password, first_name } = req.body;
   try {
@@ -12,6 +13,11 @@ const register = async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
+    }
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({
+        message: `Weak password: ${password}. Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`,
+      });
     }
     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, {
       expiresIn: '30m',

@@ -3,7 +3,7 @@ import { updateTotals } from '../../../utils/helper.js';
 
 const createBudget = async (req, res) => {
   const { name, currency, start_date, end_date, description } = req.body;
-  console.log(req.body);
+
   try {
     if (!name || !currency || !start_date || !end_date) {
       return res.status(400).json({ message: 'All fields are required' });
