@@ -60,18 +60,6 @@ app.use('/api/v1/auth', userAuthRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 
-// app.get('/logout', (req, res) => {
-//   req.logout();
-//   req.session.destroy((err) => {
-//     if (err) {
-//       console.log(err);
-//       return res.status(500).send(err);
-//     }
-//     res.clearCookie('connect.sid');
-//     res.redirect('/login');
-//   });
-// });
-
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
