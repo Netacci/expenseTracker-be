@@ -68,6 +68,10 @@ passport.use(
     `;
           await sendEmails(subject, user.email, html);
         }
+        if (!user.is_email_verified) {
+          user.is_email_verified = true;
+          await user.save();
+        }
 
         done(null, user);
       } catch (err) {
