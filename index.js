@@ -12,11 +12,9 @@ import userRoutes from './src/routes/v1/users/user.js';
 import budgetRoutes from './src/routes/v1/users/budget.js';
 import http from 'http';
 import logger from './src/utils/logger.js';
-import cookieParser from 'cookie-parser';
 
 dotenv.config();
 const app = express();
-app.use(cookieParser());
 
 app.use(
   session({
@@ -26,6 +24,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
       secure: false,
+      secure: process.env.NODE_ENV === 'production',
     },
   })
 );
