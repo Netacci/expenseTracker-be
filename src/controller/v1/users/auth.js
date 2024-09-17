@@ -157,16 +157,9 @@ const login = async (req, res) => {
         expiresIn: '1d',
       }
     );
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
-
     await user.save();
-    res.status(200).json({
-      status: 200,
-    });
+
+    res.status(200).json({ token, status: 200 });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -232,39 +225,6 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-const authCheck = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-
-    if (!token) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check if the user still exists in the database
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-
-    // If everything is fine, return success
-    return res.status(200).json({ message: 'Authenticated' });
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-};
-const logout = (req, res) => {
-  try {
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // only use secure in production
-      sameSite: 'strict',
-    });
-    return res.status(200).json({ message: 'Logout successful' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
 
 export {
   register,
@@ -273,6 +233,4 @@ export {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
-  authCheck,
-  logout,
 };
