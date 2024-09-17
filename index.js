@@ -12,12 +12,16 @@ import userRoutes from './src/routes/v1/users/user.js';
 import budgetRoutes from './src/routes/v1/users/budget.js';
 import http from 'http';
 import logger from './src/utils/logger.js';
+import MongoStore from 'connect-mongo';
 
 dotenv.config();
 const app = express();
 
 app.use(
   session({
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
