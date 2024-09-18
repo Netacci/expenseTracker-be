@@ -111,6 +111,9 @@ const budgetSchema = new mongoose.Schema(
     },
     categories: [categorySchema],
     incomes: [incomeSchema],
+    reportGenerated: {
+      type: Boolean,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

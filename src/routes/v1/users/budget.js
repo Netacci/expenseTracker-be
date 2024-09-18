@@ -13,6 +13,7 @@ import {
   editCategory,
   editExpense,
   editIncome,
+  generateReport,
   getAllBudgets,
   getAllCategories,
   getAllExpenses,
@@ -60,4 +61,5 @@ router.delete(
   deleteExpense
 );
 router.get('/:id/recent-expenses/', authenticate('user'), getRecentExpenses);
+router.post('/:id/generate-report', authenticate('user'), generateReport);
 export default router;

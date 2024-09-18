@@ -24,6 +24,25 @@ router.get(
   '/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
+
+// router.get(
+//   '/google',
+//   (req, res, next) => {
+//     console.log();
+//     if (req.isAuthenticated()) {
+//       const token = jwt.sign(
+//         { id: req.user._id, email: req.user.email },
+//         process.env.JWT_SECRET,
+//         { expiresIn: '1d' }
+//       );
+//       return res.redirect(
+//         `${process.env.BASE_URL}/auth/google/callback?token=${token}`
+//       );
+//     }
+//     next(); // Otherwise, continue to Google OAuth
+//   },
+//   passport.authenticate('google', { scope: ['profile', 'email'] })
+// );
 router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),

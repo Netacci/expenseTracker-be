@@ -43,3 +43,29 @@ export const updateTotals = async (budgetId) => {
     throw new Error('Failed to update budget totals');
   }
 };
+
+export const getUserSpendingData = async (budget) => {
+  const budgetData = {
+    budgetName: budget.name,
+    totalIncome: budget.total_income,
+    totalExpenses: budget.total_expenses,
+    categories: budget.categories,
+    incomes: budget.incomes,
+    totalBudgetAmount: budget.total_budget,
+    startDate: budget.start_date,
+    endDate: budget.end_date,
+    description: budget.description,
+    currency: budget.currency,
+  };
+
+  return {
+    budgetData,
+  };
+};
+
+// export const isAuthenticated = (req, res, next) => {
+//   if (req.isAuthenticated()) {
+//     return next(); // User is already authenticated, proceed to the next middleware
+//   }
+//   res.redirect('/login'); // Otherwise, redirect to login
+// };

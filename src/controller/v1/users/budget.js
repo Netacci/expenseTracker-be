@@ -1,5 +1,7 @@
 import Budget from '../../../models/v1/users/budget.js';
-import { updateTotals } from '../../../utils/helper.js';
+import { getUserSpendingData, updateTotals } from '../../../utils/helper.js';
+import logger from '../../../utils/logger.js';
+import { client } from '../../../utils/openAIClient.js';
 
 const createBudget = async (req, res) => {
   const { name, currency, start_date, end_date, description } = req.body;
@@ -392,6 +394,41 @@ const getRecentExpenses = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+const generateReport = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const budget = await Budget.findById({
+      _id: id,
+      user: req.user._id,
+    }).select(' -__v');
+    if (!budget) {
+      return res.status(404).json({ message: 'Budget not found' });
+    }
+    const budgetData = await getUserSpendingData(budget);
+    // console.log(budgetData);
+    const prompt = `Analyze the following spending data and generate a detailed report:   The report should include:
+    - Overview of spending habits
+    - Insights and recommendations \n\n${JSON.stringify(budgetData)}`;
+    console.log('i run here');
+
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a financial assistant.' },
+        { role: 'user', content: prompt },
+      ],
+    });
+
+    budget.reportGenerated = true;
+    await budget.save();
+    res.status(200).json({ report: response.choices[0].message });
+  } catch (err) {
+    console.log(err);
+    logger.error('Error generating report:', err.message);
+    res.status(500).json({ message: 'Failed to generate report' });
+  }
+};
 export {
   createBudget,
   getSingleBudget,
@@ -411,4 +448,5 @@ export {
   editExpense,
   deleteExpense,
   getRecentExpenses,
+  generateReport,
 };
