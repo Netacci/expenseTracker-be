@@ -396,6 +396,21 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const logout = (req, res) => {
+  req.logOut((err) => {
+    if (err) {
+      return res.status(500).send('Could not log out.');
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).send('Could not log out.');
+      }
+
+      res.status(200).send('Logged out successfully.');
+    });
+  });
+};
+
 export {
   register,
   verifyEmail,
@@ -403,4 +418,5 @@ export {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
+  logout,
 };

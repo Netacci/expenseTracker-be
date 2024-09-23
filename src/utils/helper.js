@@ -67,10 +67,3 @@ export const getUserSpendingData = async (budget) => {
     budgetData,
   };
 };
-
-// export const isAuthenticated = (req, res, next) => {
-//   if (req.isAuthenticated()) {
-//     return next(); // User is already authenticated, proceed to the next middleware
-//   }
-//   res.redirect('/login'); // Otherwise, redirect to login
-// };
