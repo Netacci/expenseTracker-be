@@ -1,7 +1,7 @@
 import Budget from '../../../models/v1/users/budget.js';
 import { getUserSpendingData, updateTotals } from '../../../utils/helper.js';
 import logger from '../../../utils/logger.js';
-import { client } from '../../../utils/openAIClient.js';
+import { client } from '../../../utils/aIClient.js';
 
 const createBudget = async (req, res) => {
   const { name, currency, start_date, end_date, description } = req.body;
@@ -405,15 +405,80 @@ const generateReport = async (req, res) => {
     if (!budget) {
       return res.status(404).json({ message: 'Budget not found' });
     }
+
     const budgetData = await getUserSpendingData(budget);
-    // console.log(budgetData);
-    const prompt = `Analyze the following spending data and generate a detailed report:   The report should include:
-    - Overview of spending habits
-    - Insights and recommendations \n\n${JSON.stringify(budgetData)}`;
-    console.log('i run here');
+
+    const prompt = `Analyze the following spending data for ${
+      budgetData.username
+    } and generate a personalized DETAILED report in HTML format. The report should include, in this order and headings, and should be in the same format for all generated reports:
+    - An overview of spending habits, trends, and patterns.
+    - Specific insights based on spending behavior.
+    - Personalized recommendations on how to improve financial habits.
+    
+    Please ensure the report is:
+    1. Clean and properly formatted in HTML with appropriate headings and bullet points.
+    2. Styled consistently using inline CSS where necessary.
+    3. Free of any variables, functions, dynamic placeholders (e.g., category.get('name')), or tables.
+    4. Only return plain text content properly formatted in HTML, ensuring correct spacing and indentation.
+    
+    ### IMPORTANT INSTRUCTIONS:
+    - Address the user directly and avoid third-person references.
+    - Do not include any formal closings (e.g., "Best regards").
+    - For any styling, use the following convention:
+      - Use the shade of green - #16a34a.
+      - Use <strong> for bold text instead of **.
+      - Use <ul> and <li> for lists instead of *.
+      - Don't use ** or *.
+      - It should be PROPERLY FORMATTED and SPACED.
+      - HEADERS SHOULD ALWAYS BE BOLD and with a color.
+      - LISTS/li elements SHOULD ALWAYS HAVE A BULLET OR NUMBER.
+      - There should be proper spacing to differentiate paragraphs and sections.
+      - There should be proper line spacing of 1.5.
+      - li element should always have a list-style CSS property with a value of "disc".
+
+      - Always use this format for all generated reports. 
+      <div id="pdfContent">
+ <div id="watermark" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); 
+  font-size: 100px; color: rgba(0, 0, 0, 0.1); pointer-events: none; white-space: nowrap;">
+  ExpenseTracker
+</div>
+      <style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    margin: 20px; 
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: #16a34a;
+    font-weight: bold;
+    margin-bottom: 15px; 
+  }
+  p {
+    margin-bottom: 10px;
+  }
+  ul {
+    list-style-type: disc; 
+      list-style-position: inside;
+    margin-left: 20px; 
+    margin-bottom: 15px;
+  }
+  li {
+    margin-bottom: 5px; 
+    line-height: 1.5;
+  }
+</style>
+ <h1>Expense Report for ${budgetData.username}</h1>
+   <div>Let all the generated content be wrapped here</div>
+   </div>
+    
+    Make sure to strictly follow these guidelines in every generated report, and the report should be VERY DETAILED.
+
+
+    
+    Here is the user's spending data: \n\n${JSON.stringify(budgetData)}`;
 
     const response = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'llama3-70b-8192',
       messages: [
         { role: 'system', content: 'You are a financial assistant.' },
         { role: 'user', content: prompt },
@@ -422,7 +487,7 @@ const generateReport = async (req, res) => {
 
     budget.reportGenerated = true;
     await budget.save();
-    res.status(200).json({ report: response.choices[0].message });
+    res.status(200).json({ report: response.choices[0].message.content });
   } catch (err) {
     console.log(err);
     logger.error('Error generating report:', err.message);

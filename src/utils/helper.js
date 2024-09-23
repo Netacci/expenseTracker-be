@@ -1,5 +1,6 @@
 import Budget from '../models/v1/users/budget.js';
 import logger from './logger.js';
+import User from './../models/v1/users/auth.js';
 
 export const updateTotals = async (budgetId) => {
   try {
@@ -45,7 +46,11 @@ export const updateTotals = async (budgetId) => {
 };
 
 export const getUserSpendingData = async (budget) => {
+  const user = budget.user;
+  const userId = user.toString();
+  const username = await User.findById(userId);
   const budgetData = {
+    username: username.first_name,
     budgetName: budget.name,
     totalIncome: budget.total_income,
     totalExpenses: budget.total_expenses,
