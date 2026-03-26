@@ -14,13 +14,21 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails[0].value;
+        const email = profile?.emails?.[0]?.value;
+        if (!email) {
+          return done(new Error('Google account has no accessible email'), null);
+        }
+
+        const firstName =
+          profile?.name?.givenName ||
+          profile?.displayName?.split(' ')?.[0] ||
+          email.split('@')[0];
         let user = await User.findOne({ email });
         if (!user) {
           user = new User({
             email,
             googleId: profile.id,
-            first_name: profile.name.givenName,
+            first_name: firstName,
             is_email_verified: true,
           });
           await user.save();
@@ -66,6 +74,7 @@ passport.use(
         </div>
       </body>
     `;
+          // Welcome email should never block OAuth sign-in.
           await sendEmails(subject, user.email, html);
         }
         if (!user.is_email_verified) {

@@ -5,13 +5,16 @@ import logger from './logger.js';
 dotenv.config();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendEmails = async (subject, to, html) => {
+const sendEmails = async (subjectOrPayload, to, html) => {
   try {
+    const payload =
+      typeof subjectOrPayload === 'object'
+        ? subjectOrPayload
+        : { subject: subjectOrPayload, to, html };
+
     await resend.emails.send({
       from: process.env.RESEND_EMAIL,
-      to,
-      subject,
-      html,
+      ...payload,
     });
   } catch (err) {
     logger.error(err);

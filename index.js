@@ -1,21 +1,25 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import morgan from 'morgan';
-import mongoose from 'mongoose';
-import session from 'express-session';
-import bodyParser from 'body-parser';
-import passport from './src/utils/auth.js';
-import userAuthRoutes from './src/routes/v1/users/auth.js';
-import userRoutes from './src/routes/v1/users/user.js';
-import budgetRoutes from './src/routes/v1/users/budget.js';
-import http from 'http';
-import logger from './src/utils/logger.js';
-import MongoStore from 'connect-mongo';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import morgan from "morgan";
+import mongoose from "mongoose";
+import session from "express-session";
+import bodyParser from "body-parser";
+import passport from "./src/utils/auth.js";
+import userAuthRoutes from "./src/routes/v1/users/auth.js";
+import userRoutes from "./src/routes/v1/users/user.js";
+import budgetRoutes from "./src/routes/v1/users/budget.js";
+import monthlyPlanRoutes from "./src/routes/v1/users/monthlyPlan.js";
+import invoiceRoutes from "./src/routes/v1/users/invoice.js";
+import subscriptionRoutes from "./src/routes/v1/users/subscription.js";
+import http from "http";
+import logger from "./src/utils/logger.js";
+import MongoStore from "connect-mongo";
 
 dotenv.config();
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(
   session({
@@ -27,9 +31,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
     },
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -37,7 +41,7 @@ app.use(passport.session());
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    logger.info('Connected to mongoDB');
+    logger.info("Connected to mongoDB");
   })
   .catch((err) => {
     logger.error(`Error connecting to mongoDB ${err}`);
@@ -46,22 +50,25 @@ mongoose
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS.split(','),
+  origin: process.env.CORS_ORIGINS.split(","),
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'Access-Control-Allow-Credentials',
+    "Content-Type",
+    "Authorization",
+    "Access-Control-Allow-Credentials",
   ],
 };
 app.use(cors(corsOptions));
-app.use('/api/v1/auth', userAuthRoutes);
-app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/budgets', budgetRoutes);
+app.use("/api/v1/auth", userAuthRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/budgets", budgetRoutes);
+app.use("/api/v1/monthly-plans", monthlyPlanRoutes);
+app.use("/api/v1/invoices", invoiceRoutes);
+app.use("/api/v1/subscriptions", subscriptionRoutes);
 const server = http.createServer(app);
 
 server.keepAliveTimeout = 120000;
